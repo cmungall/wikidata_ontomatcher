@@ -6,4 +6,5 @@ packager('Chris Mungall','cmungall@gmail.com').
 home('https://github.com//wikidata_ontomatcher').
 download('https://github.com/cmungall/wikidata_ontomatcher/releases/*.zip' ).
 requires(sparqlprog_wikidata).
+requires(rdfmatcher).
 
