@@ -16,6 +16,8 @@ clean:
 
 
 test:
+	echo "run 'make itest' for integration tests"
+itest:
 	$(SWIPL) -l tests/tests.pl -g run_tests,halt
 
 t-%:

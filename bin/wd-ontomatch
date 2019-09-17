@@ -1,0 +1,3 @@
+#!/bin/sh
+#echo "$@"
+pl2sparql -A ~/repos/onto-mirror/void.ttl -u sparqlprog_wikidata -u wikidata_ontomatcher -e -s wd "$@"

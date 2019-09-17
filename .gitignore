@@ -1,0 +1,4 @@
+tests/envo_test_cached_triples.ttl
+tests/envo_test_cached_triples.ttl.tmp
+CACHE.ttl*
+RDF-Cache/
