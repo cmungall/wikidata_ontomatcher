@@ -20,6 +20,7 @@
 :- use_module(library(sparqlprog)).
 :- use_module(library(sparqlprog_wikidata)).
 :- use_module(library(sparqlprog/emulate_builtins)).
+:- use_module(library(sparqlprog/owl_util)).
 :- use_module(library(sparqlprog/ontologies/owl), [label/2]).
 
 :- setting(target_graph, any, target_graph, 'Where rdf results are cached in memory').
@@ -41,6 +42,7 @@ match_classes(Opts) :-
         load_cached_db(Opts),
         forall(rdf(C,rdf:type,owl:'Class'),
                match_entity(C,_,Opts)).
+
 
 match_all(Opts) :-
         load_cached_db(Opts),
@@ -94,8 +96,8 @@ match_entity(_, [], _).
 %   - save enriched Triples via rdf_assert
 %   - potentially persist current graph to disk
 search_wd(Entity, Term, Triples, Opts) :-
-        debug(ontomatcher,' Searching on: ~w',[Term]),
         option(search_limit(Limit),Opts,25),
+        debug(ontomatcher,' Searching on: ~w  // limit=~w',[Term, Limit]),
         findall(X, (wd ?? entity_search(Term,X,Limit)), Xs),
         enrich_matches(Entity, Xs, Triples),
         setting(target_graph,G),
@@ -114,6 +116,7 @@ search_wd(Entity, Term, Triples, Opts) :-
 %   - X rdfs:label <label> .  # english label
 %   - X Pred Parent .         # where Parent is a named entity
 %   - Parent rdfs:label <label> 
+% TODO: make language customizable
 enrich_matches(_, [], []) :- !.
 enrich_matches(Entity, Xs, Triples) :-
         findall([
@@ -123,18 +126,27 @@ enrich_matches(Entity, Xs, Triples) :-
                  rdf(X,TP,T)],
                 (   wd ?? (member(X,Xs),
                            rdf(X,TP,T),
-                                %WG,
                            enlabel(X,XN),
                            enlabel(T,TN)
                           )),
                 Results),
         flatten(Results, TriplesAll),
         sort(TriplesAll, Triples1),
-        maplist(fix_prop,Triples1,Triples).
+        maplist(fix_prop,Triples1,Triples2),
+        findall(rdf(X,P,Y),
+                (   wd ?? (member(X,Xs),
+                           member(P,[skos:altLabel]),
+                           rdf(X,P,Y),
+                           lang(Y)="en"
+                          )),
+                AnnTriples),
+        append(Triples2,AnnTriples,Triples).
         
 fix_prop(rdf(S,'http://www.wikidata.org/prop/direct/P279',O), rdf(S,rdfs:subClassOf,O)) :- !.
 fix_prop(rdf(S,'http://www.wikidata.org/prop/direct/P31',O), rdf(S,rdf:type,O)) :- !.
+fix_prop(rdf(S,'http://www.wikidata.org/prop/direct/P910',O), rdf(S,skos:inScheme,O)) :- !.
 fix_prop(T,T).
+foo_('0').
 
 map_literal_prop(skos:altLabel, oio:hasRelatedSynonym).
 map_literal_prop(schema_org:description, obo:'IAO_0000115').

@@ -11,7 +11,7 @@
 
 test(search) :-
         T=river,
-        search_wd(x,T,Matches,[cached_db_file('tests/test_cache.pro')]),
+        search_wd(x,T,Matches,[cached_db_file('tests/test_cache.ttl')]),
         maplist(writeln, Matches),
         nl.
 

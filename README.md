@@ -6,7 +6,7 @@ This application will scan an ontology (given in some RDF serialization) and mat
 
 Command line usage:
 
-    wd-ontomatch -d ontomatcher -i envo.owl -e match_classes
+    wd-ontomatch -d ontomatcher -i envo.owl match_classes
 
 This will produce a file `CACHE.ttl` that contains `skos:closeMatch` triples, as well as rdfs:label triples for all matching entities.
 

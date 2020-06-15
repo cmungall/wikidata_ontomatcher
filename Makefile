@@ -46,12 +46,13 @@ VERSION = v$(shell swipl -l pack.pl -g "version(V),writeln(V),halt.")
 show-version:
 	echo $(VERSION)
 
-IM = /sparqlprog_wikidata
+TN = wikidata_ontomatcher
+IM = cmungall/$(TN)
 
 docker-all: docker-clean docker-build docker-run
 
 docker-clean:
-	docker kill /neoplasmer || echo not running ;
+	docker kill $(IM) || echo not running ;
 	docker kill $(IM) || echo not running ;
 	docker rm $(IM) || echo not made 
 
@@ -59,9 +60,9 @@ docker-build:
 	@docker build -t $(IM):$(VERSION) . \
 	&& docker tag $(IM):$(VERSION) $(IM):latest
 
-
 docker-run:
-	docker run --name sparqlprog_wikidata $(IM)
+	docker rm $(IM) || echo ok
+	docker run --name $(TN) $(IM)
 
 docker-publish: docker-build
 	@docker push $(IM):$(VERSION) \
